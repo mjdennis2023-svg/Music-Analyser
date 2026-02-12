@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Music Analyzer">
+    <title>Music Key & BPM Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .upload-section {
+            text-align: center;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:active {
+            transform: scale(0.95);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .camelot-wheel {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 20px auto;
+        }
+
+        .wheel-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .current-position {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #667eea;
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .position-code {
+            font-size: 24px;
+        }
+
+        .position-key {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .player-section {
+            margin-top: 20px;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        .track-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f7fa;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .analyzing {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(102, 126, 234, 0.1);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .compatible-keys {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 15px;
+        }
+
+        .compatible-keys h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .key-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .key-tag {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 Music Analyzer</h1>
+        <p>Key Detection & BPM Counter</p>
+    </div>
+
+    <div class="container">
+        <div class="card upload-section">
+            <h2 style="margin-bottom: 15px;">Analyze Live Music</h2>
+            <p style="margin-bottom: 20px; color: #666;">Play a track and let the app listen through your microphone</p>
+            
+            <div id="recordingControls">
+                <button class="upload-btn" id="startBtn">
+                    <span style="font-size: 24px;">🎤</span>
+                    Start Listening
+                </button>
+                <button class="upload-btn" id="stopBtn" style="display: none; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <span style="font-size: 24px;">⏹️</span>
+                    Stop & Analyze
+                </button>
+            </div>
+
+            <div id="recordingStatus" style="display: none; margin-top: 20px; text-align: center;">
+                <div style="display: inline-block; background: #ff4444; width: 20px; height: 20px; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                <p style="margin-top: 10px; color: #667eea; font-weight: 600;">Recording... <span id="recordingTime">0:00</span></p>
+                <p style="font-size: 12px; color: #999; margin-top: 5px;">Recording at least 10 seconds recommended</p>
+            </div>
+            
+            <div class="analyzing" id="analyzing" style="display: none;">
+                <div class="spinner"></div>
+                <p style="color: #667eea; font-weight: 600;">Analyzing your track...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+        </div>
+
+        <div class="card results" id="results">
+            <h2 style="margin-bottom: 20px;">Analysis Results</h2>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-label">BPM</div>
+                    <div class="result-value" id="bpmValue">--</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Key</div>
+                    <div class="result-value" id="keyValue">--</div>
+                </div>
+            </div>
+
+            <div class="camelot-wheel">
+                <h3 style="margin-bottom: 10px; color: #667eea;">Camelot Wheel Position</h3>
+                <div class="wheel-container">
+                    <svg class="wheel-svg" viewBox="0 0 300 300">
+                        <!-- Outer ring (Major keys) -->
+                        <g id="outerRing"></g>
+                        <!-- Inner ring (Minor keys) -->
+                        <g id="innerRing"></g>
+                    </svg>
+                    <div class="current-position" id="currentPosition">
+                        <div class="position-code" id="positionCode">--</div>
+                        <div class="position-key" id="positionKey">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="compatible-keys">
+                <h3>✨ Compatible Keys for Mixing</h3>
+                <div class="key-tags" id="compatibleKeys"></div>
+            </div>
+
+            <div class="player-section">
+                <audio id="audioPlayer" class="audio-player" controls></audio>
+                <div class="track-info" id="trackInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/meyda/5.6.0/meyda.min.js"></script>
+    <script>
+        // Camelot Wheel Mapping
+        const camelotWheel = {
+            'C major': '8B', 'A minor': '8A',
+            'G major': '9B', 'E minor': '9A',
+            'D major': '10B', 'B minor': '10A',
+            'A major': '11B', 'F# minor': '11A',
+            'F# major': '11B', 'F#m': '11A',
+            'E major': '12B', 'C# minor': '12A',
+            'B major': '1B', 'G# minor': '1A',
+            'F# major': '2B', 'D# minor': '2A',
+            'Db major': '3B', 'Bb minor': '3A',
+            'C# major': '3B', 'A# minor': '3A',
+            'Ab major': '4B', 'F minor': '4A',
+            'Eb major': '5B', 'C minor': '5A',
+            'Bb major': '6B', 'G minor': '6A',
+            'F major': '7B', 'D minor': '7A'
+        };
+
+        const keyToNote = {
+            'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
+            'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
+            'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
+        };
+
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+        let audioContext;
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordingStartTime;
+        let recordingInterval;
+        let stream;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const recordingTime = document.getElementById('recordingTime');
+
+        startBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+
+        async function startRecording() {
+            try {
+                hideError();
+                hideResults();
+                
+                // Request microphone access
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    } 
+                });
+
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Setup MediaRecorder
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    await processAudio(audioBlob);
+                };
+
+                mediaRecorder.start();
+                
+                // UI updates
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-flex';
+                recordingStatus.style.display = 'block';
+                
+                // Start timer
+                recordingStartTime = Date.now();
+                recordingInterval = setInterval(updateRecordingTime, 100);
+
+            } catch (error) {
+                showError('Microphone access denied. Please allow microphone access and try again.');
+                console.error('Error accessing microphone:', error);
+            }
+        }
+
+        function updateRecordingTime() {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            recordingTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                clearInterval(recordingInterval);
+                
+                // Stop all tracks
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                // UI updates
+                stopBtn.style.display = 'none';
+                startBtn.style.display = 'inline-flex';
+                recordingStatus.style.display = 'none';
+                showAnalyzing();
+            }
+        }
+
+        async function processAudio(blob) {
+            try {
+                const arrayBuffer = await blob.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                const bpm = await detectBPM(audioBuffer);
+                const key = await detectKey(audioBuffer);
+                
+                displayResults(bpm, key, 'Recorded Audio');
+                
+                // Setup audio player with recorded audio
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = URL.createObjectURL(blob);
+                
+            } catch (error) {
+                showError('Error analyzing audio: ' + error.message);
+                console.error('Processing error:', error);
+            } finally {
+                hideAnalyzing();
+            }
+        }
+
+        async function detectBPM(buffer) {
+            const offlineContext = new OfflineAudioContext(1, buffer.length, buffer.sampleRate);
+            const source = offlineContext.createBufferSource();
+            source.buffer = buffer;
+            
+            // Low-pass filter to focus on bass/kick drums
+            const lowpass = offlineContext.createBiquadFilter();
+            lowpass.type = 'lowpass';
+            lowpass.frequency.value = 150;
+            
+            source.connect(lowpass);
+            lowpass.connect(offlineContext.destination);
+            source.start(0);
+            
+            const filteredBuffer = await offlineContext.startRendering();
+            const data = filteredBuffer.getChannelData(0);
+            
+            // Find peaks (beats)
+            const peaks = [];
+            const threshold = getAdaptiveThreshold(data);
+            const minDistance = Math.floor(buffer.sampleRate * 0.2); // Min 200ms between peaks
+            
+            for (let i = minDistance; i < data.length - minDistance; i++) {
+                if (Math.abs(data[i]) > threshold) {
+                    let isPeak = true;
+                    for (let j = i - minDistance; j < i + minDistance; j++) {
+                        if (j !== i && Math.abs(data[j]) > Math.abs(data[i])) {
+                            isPeak = false;
+                            break;
+                        }
+                    }
+                    if (isPeak) {
+                        peaks.push(i);
+                        i += minDistance; // Skip ahead
+                    }
+                }
+            }
+            
+            if (peaks.length < 2) {
+                // Fallback: try tempo range analysis
+                return estimateBPMFromAutoCorrelation(data, buffer.sampleRate);
+            }
+            
+            // Calculate intervals between peaks
+            const intervals = [];
+            for (let i = 1; i < peaks.length; i++) {
+                intervals.push(peaks[i] - peaks[i - 1]);
+            }
+            
+            // Find most common interval (median)
+            intervals.sort((a, b) => a - b);
+            const medianInterval = intervals[Math.floor(intervals.length / 2)];
+            
+            // Convert to BPM
+            let bpm = Math.round(60 * buffer.sampleRate / medianInterval);
+            
+            // Ensure reasonable BPM range (typical electronic music: 60-180 BPM)
+            while (bpm < 60) bpm *= 2;
+            while (bpm > 180) bpm = Math.round(bpm / 2);
+            
+            return bpm;
+        }
+
+        function getAdaptiveThreshold(data) {
+            // Calculate RMS (Root Mean Square) for adaptive threshold
+            let sum = 0;
+            for (let i = 0; i < data.length; i++) {
+                sum += data[i] * data[i];
+            }
+            const rms = Math.sqrt(sum / data.length);
+            return rms * 3; // 3x RMS as threshold
+        }
+
+        function estimateBPMFromAutoCorrelation(data, sampleRate) {
+            const minBPM = 60;
+            const maxBPM = 180;
+            const minPeriod = Math.floor(60 * sampleRate / maxBPM);
+            const maxPeriod = Math.floor(60 * sampleRate / minBPM);
+            
+            let bestCorrelation = 0;
+            let bestPeriod = minPeriod;
+            
+            for (let period = minPeriod; period < maxPeriod; period += 10) {
+                let correlation = 0;
+                const samples = Math.min(sampleRate * 10, data.length - period);
+                
+                for (let i = 0; i < samples; i++) {
+                    correlation += data[i] * data[i + period];
+                }
+                
+                if (correlation > bestCorrelation) {
+                    bestCorrelation = correlation;
+                    bestPeriod = period;
+                }
+            }
+            
+            return Math.round(60 * sampleRate / bestPeriod);
+        }
+
+        async function detectKey(buffer) {
+            const sampleRate = buffer.sampleRate;
+            const channelData = buffer.getChannelData(0);
+            
+            // Analyze multiple sections of the track
+            const numSections = 8;
+            const sectionLength = Math.floor(channelData.length / numSections);
+            const chromaHistograms = [];
+            
+            for (let i = 0; i < numSections; i++) {
+                const start = i * sectionLength;
+                const end = Math.min(start + sectionLength, channelData.length);
+                const section = channelData.slice(start, end);
+                
+                const chroma = calculateChroma(section, sampleRate);
+                chromaHistograms.push(chroma);
+            }
+            
+            // Average the chroma features
+            const avgChroma = new Array(12).fill(0);
+            for (let i = 0; i < 12; i++) {
+                for (let j = 0; j < chromaHistograms.length; j++) {
+                    avgChroma[i] += chromaHistograms[j][i];
+                }
+                avgChroma[i] /= chromaHistograms.length;
+            }
+            
+            // Normalize
+            const maxChroma = Math.max(...avgChroma);
+            for (let i = 0; i < 12; i++) {
+                avgChroma[i] /= maxChroma;
+            }
+            
+            // Find the dominant note
+            const maxIdx = avgChroma.indexOf(Math.max(...avgChroma));
+            const rootNote = noteNames[maxIdx];
+            
+            // Determine if major or minor based on third interval
+            const thirdMajor = avgChroma[(maxIdx + 4) % 12];
+            const thirdMinor = avgChroma[(maxIdx + 3) % 12];
+            
+            // Also check fifth for better accuracy
+            const fifth = avgChroma[(maxIdx + 7) % 12];
+            
+            // More sophisticated major/minor detection
+            const majorScore = thirdMajor + fifth;
+            const minorScore = thirdMinor + fifth;
+            
+            const quality = majorScore > minorScore ? 'major' : 'minor';
+            
+            return `${rootNote} ${quality}`;
+        }
+
+        function calculateChroma(audioData, sampleRate) {
+            const chroma = new Array(12).fill(0);
+            const fftSize = 8192;
+            const hopSize = fftSize / 4;
+            
+            // Process audio in overlapping windows
+            for (let i = 0; i < audioData.length - fftSize; i += hopSize) {
+                const window = audioData.slice(i, i + fftSize);
+                
+                // Apply Hamming window
+                for (let j = 0; j < window.length; j++) {
+                    window[j] *= 0.54 - 0.46 * Math.cos(2 * Math.PI * j / (window.length - 1));
+                }
+                
+                // Simple energy-based pitch detection
+                for (let noteIdx = 0; noteIdx < 12; noteIdx++) {
+                    let energy = 0;
+                    
+                    // Check multiple octaves
+                    for (let octave = 2; octave < 7; octave++) {
+                        const freq = 440 * Math.pow(2, (noteIdx - 9) / 12 + (octave - 4));
+                        const period = sampleRate / freq;
+                        const periodSamples = Math.floor(period);
+                        
+                        if (periodSamples < window.length / 2) {
+                            // Autocorrelation at this period
+                            let autocorr = 0;
+                            for (let k = 0; k < window.length - periodSamples; k++) {
+                                autocorr += window[k] * window[k + periodSamples];
+                            }
+                            energy += Math.abs(autocorr);
+                        }
+                    }
+                    chroma[noteIdx] += energy;
+                }
+            }
+            
+            // Normalize
+            const maxEnergy = Math.max(...chroma);
+            return maxEnergy > 0 ? chroma.map(val => val / maxEnergy) : chroma;
+        }
+
+        function displayResults(bpm, key, filename) {
+            document.getElementById('bpmValue').textContent = bpm;
+            document.getElementById('keyValue').textContent = key;
+            
+            const camelotCode = camelotWheel[key] || '?';
+            document.getElementById('positionCode').textContent = camelotCode;
+            document.getElementById('positionKey').textContent = key;
+            
+            // Display compatible keys
+            const compatible = getCompatibleKeys(camelotCode);
+            const compatibleKeysDiv = document.getElementById('compatibleKeys');
+            compatibleKeysDiv.innerHTML = compatible.map(k => 
+                `<div class="key-tag">${k}</div>`
+            ).join('');
+            
+            // Display track info
+            document.getElementById('trackInfo').innerHTML = `
+                <strong>Source:</strong> ${filename}<br>
+                <strong>Camelot Code:</strong> ${camelotCode}
+            `;
+            
+            drawCamelotWheel(camelotCode);
+            showResults();
+        }
+
+        function getCompatibleKeys(camelotCode) {
+            if (camelotCode === '?') return [];
+            
+            const num = parseInt(camelotCode);
+            const letter = camelotCode.slice(-1);
+            
+            const compatible = [];
+            
+            // Same number, opposite letter (relative major/minor)
+            compatible.push(num + (letter === 'A' ? 'B' : 'A'));
+            
+            // Adjacent numbers, same letter (+1/-1)
+            compatible.push((num === 12 ? 1 : num + 1) + letter);
+            compatible.push((num === 1 ? 12 : num - 1) + letter);
+            
+            return compatible;
+        }
+
+        function drawCamelotWheel(currentCode) {
+            const outerRing = document.getElementById('outerRing');
+            const innerRing = document.getElementById('innerRing');
+            
+            outerRing.innerHTML = '';
+            innerRing.innerHTML = '';
+            
+            const colors = [
+                '#FF6B6B', '#FFA07A', '#FFD93D', '#6BCF7F', '#4ECDC4',
+                '#45B7D1', '#5F9DF7', '#8B7FE6', '#B088F9', '#DA70D6',
+                '#FF85C2', '#FF6B9D'
+            ];
+            
+            // Draw outer ring (major keys - B)
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const x = 150 + 110 * Math.cos(angle);
+                const y = 150 + 110 * Math.sin(angle);
+                
+                const code = (i === 0 ? 12 : i) + 'B';
+                const isActive = code === currentCode;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', isActive ? 20 : 15);
+                circle.setAttribute('fill', colors[i]);
+                circle.setAttribute('opacity', isActive ? 1 : 0.6);
+                circle.setAttribute('stroke', isActive ? '#fff' : 'none');
+                circle.setAttribute('stroke-width', isActive ? 3 : 0);
+                
+                outerRing.appendChild(circle);
+            }
+            
+            // Draw inner ring (minor keys - A)
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const x = 150 + 70 * Math.cos(angle);
+                const y = 150 + 70 * Math.sin(angle);
+                
+                const code = (i === 0 ? 12 : i) + 'A';
+                const isActive = code === currentCode;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', isActive ? 18 : 13);
+                circle.setAttribute('fill', colors[i]);
+                circle.setAttribute('opacity', isActive ? 1 : 0.5);
+                circle.setAttribute('stroke', isActive ? '#fff' : 'none');
+                circle.setAttribute('stroke-width', isActive ? 3 : 0);
+                
+                innerRing.appendChild(circle);
+            }
+        }
+
+        function showAnalyzing() {
+            document.getElementById('analyzing').style.display = 'block';
+        }
+
+        function hideAnalyzing() {
+            document.getElementById('analyzing').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('results').classList.add('active');
+        }
+
+        function hideResults() {
+            document.getElementById('results').classList.remove('active');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+        }
+
+        function hideError() {
+            document.getElementById('error').classList.remove('active');
+        }
+
+        // Initialize Camelot wheel on load
+        drawCamelotWheel('8B');
+    </script>
+</body>
+</html>
