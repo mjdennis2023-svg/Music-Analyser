@@ -66,7 +66,7 @@
             height: 100%;
             opacity: 0.03;
             pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-image: url("image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             z-index: 1;
         }
 
@@ -190,14 +190,8 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .card:nth-child(1) { animation-delay: 0.1s; }
@@ -248,9 +242,7 @@
             transition: opacity 0.3s;
         }
 
-        .btn:hover::before {
-            opacity: 1;
-        }
+        .btn:hover::before { opacity: 1; }
 
         .btn span {
             position: relative;
@@ -262,9 +254,7 @@
             box-shadow: 0 15px 50px rgba(0, 240, 255, 0.5);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
+        .btn:active { transform: translateY(0); }
 
         .btn.stop {
             background: linear-gradient(135deg, #ff0055, #ff4488);
@@ -280,7 +270,6 @@
             cursor: not-allowed;
             transform: none;
         }
-
         .recording-status {
             margin-top: 24px;
             padding: 20px;
@@ -337,9 +326,7 @@
             display: none;
         }
 
-        .analyzing.active {
-            display: block;
-        }
+        .analyzing.active { display: block; }
 
         .spinner {
             width: 60px;
@@ -370,13 +357,8 @@
             color: var(--text-secondary);
         }
 
-        .results {
-            display: none;
-        }
-
-        .results.active {
-            display: block;
-        }
+        .results { display: none; }
+        .results.active { display: block; }
 
         .metrics {
             display: grid;
@@ -464,9 +446,7 @@
             letter-spacing: 1px;
         }
 
-        .camelot-section {
-            margin: 32px 0;
-        }
+        .camelot-section { margin: 32px 0; }
 
         .camelot-title {
             text-align: center;
@@ -621,9 +601,7 @@
             display: none;
         }
 
-        .debug-panel.active {
-            display: block;
-        }
+        .debug-panel.active { display: block; }
 
         .error {
             background: rgba(255, 0, 85, 0.1);
@@ -642,37 +620,18 @@
         }
 
         @media (max-width: 768px) {
-            .logo {
-                font-size: 36px;
-            }
-
-            .metrics {
-                grid-template-columns: 1fr;
-            }
-
-            .details-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .wheel-container {
-                width: 280px;
-                height: 280px;
-            }
+            .logo { font-size: 36px; }
+            .metrics { grid-template-columns: 1fr; }
+            .details-grid { grid-template-columns: 1fr; }
+            .wheel-container { width: 280px; height: 280px; }
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb {
             background: var(--accent-primary);
             border-radius: 4px;
         }
-
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent-secondary);
         }
@@ -815,11 +774,8 @@
 <script>
     // ============================================
     // HARMONIC ANALYZER PRO - TRANCE EDITION
-    // Professional-Grade Key & BPM Detection
-    // Optimized for 130-145 BPM Trance
     // ============================================
 
-    // PROFESSIONAL CAMELOT WHEEL MAPPING
     const CAMELOT_WHEEL = {
         'C major': '8B', 'Db major': '3B', 'D major': '10B', 'Eb major': '5B',
         'E major': '12B', 'F major': '7B', 'F# major': '2B', 'Gb major': '2B',
@@ -833,14 +789,12 @@
         Object.entries(CAMELOT_WHEEL).map(([key, camelot]) => [camelot, key])
     );
 
-    // Krumhansl-Schmuckler key profiles
     const KEY_PROFILES = {
         major: [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88],
         minor: [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
     };
 
     const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const NOTE_NAMES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
     let audioContext;
     let mediaRecorder;
@@ -870,8 +824,7 @@
     }
 
     function hideError() {
-        const errorEl = document.getElementById('error');
-        errorEl.classList.remove('active');
+        document.getElementById('error').classList.remove('active');
     }
 
     function showAnalyzing() {
@@ -970,7 +923,6 @@
             
             log(`Audio decoded: ${audioBuffer.duration.toFixed(2)}s, ${audioBuffer.sampleRate}Hz`);
 
-            // Validate audio
             const validation = validateAudio(audioBuffer);
             log(`Audio validation: ${JSON.stringify(validation)}`);
 
@@ -1003,7 +955,6 @@
         const duration = buffer.duration;
         const data = buffer.getChannelData(0);
         
-        // Calculate RMS
         let sumSquare = 0;
         for (let i = 0; i < data.length; i++) {
             sumSquare += data[i] * data[i];
@@ -1028,7 +979,6 @@
             quality
         };
     }
-
     // ===== TRANCE-OPTIMIZED BPM DETECTION =====
     async function detectBPMPrecision_TranceOptimized(buffer) {
         const sampleRate = buffer.sampleRate;
@@ -1036,21 +986,14 @@
         
         log('Starting TRANCE-OPTIMIZED BPM detection (130-145 target)...');
         
-        // Step 1: Extract kick-focused onset envelope (40-100 Hz weighted)
         const kickOnsets = extractKickOnsetEnvelope(channelData, sampleRate);
-        
-        // Step 2: Calculate intervals with trance-specific constraints
         const intervals = calculateInterOnsetIntervals_Trance(kickOnsets, sampleRate);
         log(`Found ${intervals.length} inter-onset intervals`);
         
-        // Step 3: Build histogram focusing on 130-145 range
         const histogram = buildBeatHistogram_Constrained(intervals, sampleRate, 120, 160);
-        
-        // Step 4: Peak picking with trance rules
         const tempoCandidates = findTempoPeaks_Trance(histogram);
         log(`Tempo candidates: ${tempoCandidates.slice(0, 3).map(t => t.bpm.toFixed(1)).join(', ')}`);
         
-        // Step 5: Select best with harmonic verification
         const finalBPM = selectBestTempo_Trance(tempoCandidates, intervals);
         const confidence = calculateTempoConfidence_Trance(tempoCandidates, finalBPM, intervals.length);
         const stability = checkTempoStability(intervals, finalBPM);
@@ -1067,11 +1010,10 @@
     }
 
     function extractKickOnsetEnvelope(data, sampleRate) {
-        // Filter to focus on low frequencies (kick drum range)
         const filtered = bandpassFilter(data, sampleRate, 40, 100);
         
         const fftSize = 2048;
-        const hopSize = 441; // ~10ms
+        const hopSize = 441;
         const numFrames = Math.floor((filtered.length - fftSize) / hopSize);
         
         const envelope = new Float32Array(numFrames);
@@ -1081,20 +1023,17 @@
             const start = i * hopSize;
             const frame = filtered.slice(start, start + fftSize);
             
-            // Energy-based onset detection for kicks
             let frameEnergy = 0;
             for (let j = 0; j < frame.length; j++) {
                 frameEnergy += frame[j] * frame[j];
             }
             frameEnergy = Math.sqrt(frameEnergy / frame.length);
             
-            // Half-wave rectified difference
             const diff = Math.max(0, frameEnergy - prevEnergy * 0.9);
             envelope[i] = diff;
             prevEnergy = frameEnergy;
         }
         
-        // Normalize
         const max = Math.max(...envelope);
         if (max > 0) {
             for (let i = 0; i < envelope.length; i++) {
@@ -1120,9 +1059,7 @@
                         break;
                     }
                 }
-                if (isPeak) {
-                    peaks.push(i);
-                }
+                if (isPeak) peaks.push(i);
             }
         }
         
@@ -1130,11 +1067,8 @@
         for (let i = 1; i < peaks.length; i++) {
             const intervalFrames = peaks[i] - peaks[i - 1];
             const intervalSeconds = intervalFrames * hopSize / sampleRate;
-            
             const bpm = 60 / intervalSeconds;
-            if (bpm >= 100 && bpm <= 160) {
-                intervals.push(intervalSeconds);
-            }
+            if (bpm >= 100 && bpm <= 160) intervals.push(intervalSeconds);
         }
         
         return intervals;
@@ -1159,7 +1093,6 @@
                 }
             }
         }
-        
         return histogram;
     }
 
@@ -1183,11 +1116,7 @@
             
             if (isPeak && (histogram[i] - minNeighbor) > histogram[i] * 0.1) {
                 const bpm = minBPM + i;
-                peaks.push({
-                    bpm: bpm,
-                    strength: histogram[i],
-                    prominence: histogram[i] - minNeighbor
-                });
+                peaks.push({ bpm, strength: histogram[i], prominence: histogram[i] - minNeighbor });
             }
         }
         
@@ -1199,21 +1128,14 @@
         if (candidates.length === 0) return 130;
         
         const primaryRange = candidates.filter(c => c.bpm >= 130 && c.bpm <= 145);
-        if (primaryRange.length > 0) {
-            return Math.round(primaryRange[0].bpm);
-        }
+        if (primaryRange.length > 0) return Math.round(primaryRange[0].bpm);
         
         const strongest = candidates[0].bpm;
-        
         const doubleTempo = strongest * 2;
-        if (doubleTempo >= 130 && doubleTempo <= 145) {
-            return Math.round(doubleTempo);
-        }
+        if (doubleTempo >= 130 && doubleTempo <= 145) return Math.round(doubleTempo);
         
         const halfTempo = strongest / 2;
-        if (halfTempo >= 130 && halfTempo <= 145) {
-            return Math.round(halfTempo);
-        }
+        if (halfTempo >= 130 && halfTempo <= 145) return Math.round(halfTempo);
         
         return Math.round(strongest);
     }
@@ -1226,28 +1148,21 @@
         
         for (const candidate of candidates) {
             totalStrength += candidate.strength;
-            
             const isClose = Math.abs(candidate.bpm - finalBPM) <= 0.5;
             const isOctave = Math.abs(candidate.bpm - finalBPM * 2) <= 1 ||
-                            Math.abs(candidate.bpm - finalBPM / 2) <= 1;
+                             Math.abs(candidate.bpm - finalBPM / 2) <= 1;
             const isTriple = Math.abs(candidate.bpm - finalBPM * 3) <= 1.5 ||
-                            Math.abs(candidate.bpm - finalBPM / 3) <= 0.5;
-            
-            if (isClose || isOctave || isTriple) {
-                matchingStrength += candidate.strength;
-            }
+                             Math.abs(candidate.bpm - finalBPM / 3) <= 0.5;
+            if (isClose || isOctave || isTriple) matchingStrength += candidate.strength;
         }
         
         const mainPeak = candidates[0].strength;
         const secondPeak = candidates[1]?.strength || 0;
         const prominence = (mainPeak - secondPeak) / mainPeak;
-        
-        const peakSharpness = Math.exp(-candidates.length / 5);
         const signalQuality = Math.min(1.0, totalIntervals / 50);
-        
         const confidenceBase = (matchingStrength / totalStrength) * 100;
         const dominanceFactor = Math.min(1.0, prominence);
-        const finalConfidence = confidenceBase * (0.5 + 0.5 * dominanceFactor);
+        const finalConfidence = confidenceBase * (0.5 + 0.5 * dominanceFactor) * signalQuality;
         
         return Math.max(20, Math.min(85, finalConfidence));
     }
@@ -1259,7 +1174,7 @@
         for (const interval of intervals) {
             variance += Math.pow(interval - expectedInterval, 2);
         }
-        variance /= intervals.length;
+        variance /= intervals.length || 1;
         
         const stability = Math.max(0, 1 - Math.sqrt(variance) / expectedInterval) * 100;
         return Math.min(100, stability);
@@ -1267,24 +1182,19 @@
 
     function bandpassFilter(data, sampleRate, lowHz, highHz) {
         const filtered = new Float32Array(data.length);
-        
         const a1 = -1.5;
         const a2 = 0.7;
-        
         let y1 = 0, y2 = 0;
         
         for (let i = 0; i < data.length; i++) {
             const x = data[i];
             const y = x + a1 * y1 + a2 * y2;
-            
             filtered[i] = y;
             y2 = y1;
             y1 = y;
         }
-        
         return filtered;
     }
-
     // ===== PRECISION KEY DETECTION =====
     async function detectKeyPrecision(buffer) {
         const sampleRate = buffer.sampleRate;
@@ -1296,7 +1206,6 @@
         log(`Chromagram: ${chromagram.map(v => v.toFixed(3)).join(', ')}`);
         
         const keyResults = applyKSAlgorithm(chromagram);
-        
         const finalKey = keyResults[0].key;
         const confidence = Math.min(85, keyResults[0].correlation * 100);
         
@@ -1320,7 +1229,6 @@
             const start = Math.floor(win * (data.length - fftSize) / numAnalyze);
             const segment = data.slice(start, start + fftSize);
             
-            // Blackman-Harris window
             const windowed = new Float32Array(fftSize);
             for (let i = 0; i < fftSize; i++) {
                 const a0 = 0.35875;
@@ -1336,65 +1244,44 @@
             }
             
             const pitchClasses = calculatePitchClassesFFT(windowed, sampleRate, fftSize);
-            
-            for (let i = 0; i < 12; i++) {
-                chromagram[i] += pitchClasses[i];
-            }
+            for (let i = 0; i < 12; i++) chromagram[i] += pitchClasses[i];
         }
         
-        // Normalize
         const sum = chromagram.reduce((a, b) => a + b, 0);
-        if (sum > 0) {
-            for (let i = 0; i < 12; i++) {
-                chromagram[i] /= sum;
-            }
-        }
+        if (sum > 0) for (let i = 0; i < 12; i++) chromagram[i] /= sum;
         
-        // Trance-optimized harmonic weighting
         const weighted = new Array(12).fill(0);
         for (let i = 0; i < 12; i++) {
-            weighted[i] += chromagram[i] * 1.2; // Root
-            weighted[(i + 7) % 12] += chromagram[i] * 0.8; // Perfect 5th
-            weighted[(i + 12) % 12] += chromagram[i] * 0.6; // Octave
-            weighted[(i + 3) % 12] += chromagram[i] * 0.3; // Minor 3rd
-            weighted[(i + 4) % 12] += chromagram[i] * 0.2; // Major 3rd
+            weighted[i] += chromagram[i] * 1.2;
+            weighted[(i + 7) % 12] += chromagram[i] * 0.8;
+            weighted[(i + 3) % 12] += chromagram[i] * 0.3;
+            weighted[(i + 4) % 12] += chromagram[i] * 0.2;
         }
         
         const wSum = weighted.reduce((a, b) => a + b, 0);
-        if (wSum > 0) {
-            for (let i = 0; i < 12; i++) {
-                weighted[i] /= wSum;
-            }
-        }
-        
+        if (wSum > 0) for (let i = 0; i < 12; i++) weighted[i] /= wSum;
         return weighted;
     }
 
     function calculatePitchClassesFFT(signal, sampleRate, fftSize) {
         const N = fftSize;
         const pitchClasses = new Array(12).fill(0);
-        
         const A4_Hz = 440;
         const A4_midiNote = 69;
-        
         const fftMagnitude = computeFFTMagnitude(signal);
         
         for (let pc = 0; pc < 12; pc++) {
             let pcEnergy = 0;
-            
             for (let octave = 2; octave <= 8; octave++) {
                 const midiNote = pc + (octave * 12);
                 const frequencyHz = A4_Hz * Math.pow(2, (midiNote - A4_midiNote) / 12);
                 const binIndex = Math.round(frequencyHz / (sampleRate / fftSize));
-                
                 if (binIndex > 0 && binIndex < fftSize / 2) {
                     pcEnergy += Math.log(1 + Math.abs(fftMagnitude[binIndex]));
                 }
             }
-            
             pitchClasses[pc] = pcEnergy;
         }
-        
         return pitchClasses;
     }
 
@@ -1402,44 +1289,34 @@
         const N = signal.length;
         const real = new Float32Array(N);
         const imag = new Float32Array(N);
-        
         for (let i = 0; i < N; i++) real[i] = signal[i];
         
-        // Bit-reversal permutation
         for (let i = 0, j = 0; i < N; i++) {
             if (i < j) {
                 [real[i], real[j]] = [real[j], real[i]];
                 [imag[i], imag[j]] = [imag[j], imag[i]];
             }
-            
             let mask = N >> 1;
             for (; j & mask; mask >>= 1) j &= ~mask;
             j |= mask;
         }
         
-        // Cooley-Tukey FFT
         for (let s = 1; s < Math.log2(N); s++) {
             const m = 1 << s;
             const mDiv2 = m >> 1;
             const angleIncrement = -(2 * Math.PI / m);
-            
             for (let k = 0; k < N; k += m) {
                 let angle = 0;
-                
                 for (let j = 0; j < mDiv2; j++) {
                     const cosAngle = Math.cos(angle);
                     const sinAngle = Math.sin(angle);
-                    
                     const t = k + j + mDiv2;
                     const tr = real[t] * cosAngle - imag[t] * sinAngle;
                     const ti = real[t] * sinAngle + imag[t] * cosAngle;
-                    
                     real[t] = real[k + j] - tr;
                     imag[t] = imag[k + j] - ti;
-                    
                     real[k + j] += tr;
                     imag[k + j] += ti;
-                    
                     angle += angleIncrement;
                 }
             }
@@ -1449,67 +1326,51 @@
         for (let i = 0; i < N / 2; i++) {
             magnitude[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
         }
-        
         return magnitude;
     }
 
     function applyKSAlgorithm(chromagram) {
         const results = [];
-        
         for (let rootNote = 0; rootNote < 12; rootNote++) {
             for (const [mode, profile] of Object.entries(KEY_PROFILES)) {
                 let correlation = 0;
-                
                 for (let i = 0; i < 12; i++) {
                     const pitchClass = (rootNote + i) % 12;
                     correlation += chromagram[pitchClass] * profile[i];
                 }
-                
                 const keyName = `${NOTE_NAMES[rootNote]} ${mode}`;
-                results.push({
-                    key: keyName,
-                    correlation: correlation,
-                    rootNote: rootNote,
-                    mode: mode
-                });
+                results.push({ key: keyName, correlation, rootNote, mode });
             }
         }
-        
         results.sort((a, b) => b.correlation - a.correlation);
         return results;
     }
 
     // ===== DISPLAY RESULTS =====
     function displayResults(bpmResult, keyResult, duration, validation) {
-        // BPM Results
         document.getElementById('bpmValue').textContent = bpmResult.bpm;
         document.getElementById('bpmConfidence').style.width = bpmResult.confidence + '%';
         document.getElementById('bpmConfidenceText').textContent = `${bpmResult.confidence.toFixed(0)}% confidence`;
-        
         if (bpmResult.candidates.length > 1) {
-            document.getElementById('bpmCandidates').textContent = `Also: ${bpmResult.candidates.slice(1, 3).map(b => Math.round(b)).join(', ')}`;
+            document.getElementById('bpmCandidates').textContent =
+                `Also: ${bpmResult.candidates.slice(1, 3).map(b => Math.round(b)).join(', ')}`;
         }
-        
-        // Key Results
-        document.getElementById('keyValue').textContent = bpmResult.key || keyResult.key;
+
+        document.getElementById('keyValue').textContent = keyResult.key;
         document.getElementById('keyConfidence').style.width = keyResult.confidence + '%';
         document.getElementById('keyConfidenceText').textContent = `${keyResult.confidence.toFixed(0)}% confidence`;
-        
         if (keyResult.candidates.length > 1) {
             document.getElementById('keyCandidates').textContent = `Alt: ${keyResult.candidates[1]}`;
         }
-        
-        // Camelot Wheel
+
         const camelotCode = CAMELOT_WHEEL[keyResult.key];
-        document.getElementById('positionCode').textContent = camelotCode;
+        document.getElementById('positionCode').textContent = camelotCode || '--';
         document.getElementById('positionKey').textContent = keyResult.key.split(' ')[0];
-        document.getElementById('camelotDetail').textContent = camelotCode;
-        
-        // Compatible Keys
-        const compatible = getCompatibleKeys(camelotCode);
+        document.getElementById('camelotDetail').textContent = camelotCode || '--';
+
+        const compatible = camelotCode ? getCompatibleKeys(camelotCode) : [];
         const compatibleEl = document.getElementById('compatibleKeys');
         compatibleEl.innerHTML = '';
-        
         compatible.forEach(code => {
             const keyName = CAMELOT_TO_KEY[code];
             const tag = document.createElement('div');
@@ -1517,36 +1378,28 @@
             tag.textContent = `${code} - ${keyName}`;
             compatibleEl.appendChild(tag);
         });
-        
-        // Analysis Details
+
         document.getElementById('keyMethod').textContent = 'K-S Algorithm';
         document.getElementById('bpmMethod').textContent = 'Trance Kick Detection';
         document.getElementById('durationAnalyzed').textContent = duration.toFixed(1) + 's';
         document.getElementById('tempoStability').textContent = bpmResult.stability.toFixed(0) + '%';
-        document.getElementById('signalQuality').textContent = validation.quality.charAt(0).toUpperCase() + validation.quality.slice(1);
-        
+        document.getElementById('signalQuality').textContent =
+            validation.quality.charAt(0).toUpperCase() + validation.quality.slice(1);
+
         showResults();
     }
 
     function getCompatibleKeys(camelotCode) {
+        if (!camelotCode) return [];
         const compatible = [camelotCode];
-        
-        const [number, mode] = [parseInt(camelotCode), camelotCode.slice(-1)];
-        
-        // Same number, different mode
+        const number = parseInt(camelotCode);
+        const mode = camelotCode.slice(-1);
         const otherMode = mode === 'A' ? 'B' : 'A';
-        compatible.push(number + otherMode);
-        
-        // Adjacent numbers, same mode
         const prev = number === 1 ? 12 : number - 1;
         const next = number === 12 ? 1 : number + 1;
-        compatible.push(prev + mode);
-        compatible.push(next + mode);
-        
-        // Adjacent numbers, different mode
-        compatible.push(prev + otherMode);
-        compatible.push(next + otherMode);
-        
+        compatible.push(number + otherMode);
+        compatible.push(prev + mode, next + mode);
+        compatible.push(prev + otherMode, next + otherMode);
         return compatible;
     }
 
